@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Solid black backdrop + centered Switch wordmark.
+     Replaces the per-orientation bitmap splashes whose tiny logo got
+     stretched / clipped depending on the screen. The bitmap is sized in
+     dp so the logo stays consistent across devices, and the existing
+     mipmap foreground is reused (its black rounded-square blends into
+     the black bg, leaving just the white "Switch" wordmark). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@android:color/black" />
+    <item
+        android:width="180dp"
+        android:height="180dp"
+        android:gravity="center">
+        <bitmap
+            android:src="@mipmap/ic_launcher_foreground"
+            android:gravity="center"
+            android:antialias="true"
+            android:filter="true" />
+    </item>
+</layer-list>

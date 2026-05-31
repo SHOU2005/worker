@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Urgent-job call card — premium black/white, Switch-branded, with a
+  slide-to-accept rail. Mirrors the visual language of the PWA install
+  gate + the worker dashboard's "Slide to Arrive" button.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#000000"
+    android:gravity="center_horizontal"
+    android:fitsSystemWindows="true"
+    android:paddingHorizontal="28dp"
+    android:paddingTop="80dp"
+    android:paddingBottom="40dp">
+
+    <!-- Switch wordmark — white text on the black surface, same look as
+         the worker login hero. -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch"
+        android:textColor="#FFFFFF"
+        android:textSize="44sp"
+        android:textStyle="bold"
+        android:letterSpacing="-0.02" />
+
+    <!-- Eyebrow label -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="URGENT JOB"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.3"
+        android:layout_marginTop="36dp"
+        android:alpha="0.55" />
+
+    <!-- Service / area title -->
+    <TextView
+        android:id="@+id/urgent_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="14dp"
+        tools:text="Maid · Sector 14" />
+
+    <!-- Pay + duration + distance -->
+    <TextView
+        android:id="@+id/urgent_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="17sp"
+        android:gravity="center"
+        android:alpha="0.55"
+        android:layout_marginTop="12dp"
+        tools:text="₹400 · 4 hrs · 1.2 km away" />
+
+    <!-- "First to accept wins" hint -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="First to accept wins"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.18"
+        android:alpha="0.4"
+        android:layout_marginTop="22dp" />
+
+    <!-- Flex spacer pushes the slider to the bottom -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- ── Slide-to-accept rail ──────────────────────────────── -->
+    <FrameLayout
+        android:id="@+id/slide_rail"
+        android:layout_width="match_parent"
+        android:layout_height="74dp"
+        android:background="@drawable/bg_slide_track">
+
+        <!-- Centered "Slide to accept" hint text — fades as the user slides -->
+        <TextView
+            android:id="@+id/slide_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Slide to accept"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.04"
+            android:alpha="0.55" />
+
+        <!-- Draggable white thumb — kotlin sets its x position on touch -->
+        <FrameLayout
+            android:id="@+id/slide_thumb"
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_slide_thumb">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="→"
+                android:textColor="#000000"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+    </FrameLayout>
+
+    <!-- Decline — subtle text-only link, no big button -->
+    <TextView
+        android:id="@+id/btn_decline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Decline"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:padding="20dp"
+        android:alpha="0.45" />
+
+</LinearLayout>

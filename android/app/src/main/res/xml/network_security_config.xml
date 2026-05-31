@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Production network-security policy for the Switch Players APK.
+
+  Default: all traffic must be HTTPS. Cleartext (HTTP) is only allowed
+  for localhost so `adb reverse` + local-dev tunnels work for
+  developers; production builds never make a cleartext request to
+  anything off-device. A DNS hijack now can't redirect the webview to
+  an HTTP attacker server because the platform rejects the connection
+  before the WebView even sees it.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>  <!-- Android emulator → host -->
+        <!-- Live-reload dev: Capacitor webview hits the developer's Mac on
+             the local Wi-Fi. Keep this list short and on private RFC1918
+             ranges only; production webview never speaks cleartext to LAN. -->
+        <domain includeSubdomains="true">192.168.1.118</domain>
+    </domain-config>
+</network-security-config>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Switch Ops</string>
+    <string name="title_activity_main">Switch Ops</string>
+    <string name="package_name">com.switchlocally.ops</string>
+    <string name="custom_url_scheme">com.switchlocally.ops</string>
+</resources>

@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Switch — Pitch Deck v2</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{
+    --ink:#0b0b0b;
+    --paper:#f7f5f0;
+    --paper-2:#efece5;
+    --accent:#FFD400;
+    --accent2:#00E27A;
+    --muted:#3d3a36;
+    --muted-d:#cfcdc8;
+    --rule:#e2dfd8;
+    --rule-d:#1f1f1d;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    background:var(--paper);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Inter","Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    font-feature-settings:"ss01","cv11","tnum","kern";
+  }
+
+  /* ---------- SLIDE FRAME ---------- */
+  .slide{
+    position:relative;
+    width:100vw;height:100vh;
+    padding:8vh 7vw 9vh;
+    display:flex;flex-direction:column;
+    overflow:hidden;
+    page-break-after:always;
+  }
+  .slide.dark{background:var(--ink);color:#f0eee9}
+  .slide.cream{background:var(--paper-2)}
+  .slide.yellow{background:var(--accent);color:var(--ink)}
+
+  /* ---------- CHAPTER + PAGE MARKERS ---------- */
+  .chapter{
+    position:absolute;top:5vh;left:7vw;
+    font-size:.85vw;letter-spacing:.32em;text-transform:uppercase;
+    font-weight:800;color:var(--muted);
+  }
+  .slide.dark .chapter{color:#bdbab4}
+  .slide.yellow .chapter{color:#5a4d00}
+
+  .pageno{
+    position:absolute;bottom:5vh;right:7vw;
+    font-size:.78vw;letter-spacing:.32em;
+    font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;
+  }
+  .slide.dark .pageno{color:#bdbab4}
+  .slide.yellow .pageno{color:#5a4d00}
+
+  /* ---------- TYPE ---------- */
+  .hero{font-size:14vw;line-height:.95;font-weight:900;letter-spacing:-.04em;padding-bottom:.05em}
+  .lede{font-size:3vw;line-height:1.1;font-weight:700;letter-spacing:-.015em}
+  h2.title{font-size:5.2vw;line-height:1.08;font-weight:900;letter-spacing:-.025em;margin-bottom:2.5vh;padding-bottom:.05em}
+  h2.title-sm{font-size:4vw;line-height:1.08;font-weight:900;letter-spacing:-.02em;margin-bottom:2.5vh;padding-bottom:.05em}
+  .subtitle{font-size:1.9vw;line-height:1.25;font-weight:500;color:var(--muted);max-width:55ch;margin-bottom:5vh}
+  .slide.dark .subtitle{color:#bdbab4}
+  .slide.yellow .subtitle{color:#3a3100}
+
+  p.body, li.body{font-size:1.35vw;line-height:1.5;font-weight:400;max-width:60ch;color:#2a2a28}
+  .slide.dark p.body, .slide.dark li.body{color:#c4c2bd}
+
+  .caption{
+    margin-top:auto;padding-top:4vh;
+    font-size:1vw;line-height:1.5;font-weight:500;color:var(--muted);max-width:80ch;
+  }
+  .slide.dark .caption{color:#bdbab4}
+  .slide.yellow .caption{color:#3a3100}
+
+  .eyebrow{
+    font-size:.8vw;letter-spacing:.3em;text-transform:uppercase;
+    font-weight:800;color:var(--muted);margin-bottom:1.2vh;
+  }
+  .slide.dark .eyebrow{color:#bdbab4}
+  .slide.yellow .eyebrow{color:#5a4d00}
+
+  /* ---------- ACCENTS ---------- */
+  .hi{background:var(--accent);padding:0 .12em;color:var(--ink)}
+  .hi-g{background:var(--accent2);padding:0 .12em;color:var(--ink)}
+  .y{color:var(--accent)}
+  .gr{color:var(--accent2)}
+
+  /* ---------- GRIDS ---------- */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:5vw}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:3.5vw}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:2.8vw}
+
+  /* ---------- STATS ---------- */
+  .stat .n{font-size:6vw;line-height:.88;font-weight:900;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+  .stat .n .u{font-size:.42em;font-weight:800;margin-left:.05em;letter-spacing:0}
+  .stat .l{
+    font-size:.9vw;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--muted);margin-top:1.2vh;font-weight:700;
+  }
+  .slide.dark .stat .l{color:#bdbab4}
+
+  /* ---------- CARDS / COLUMNS ---------- */
+  /* Reset against app globals.css `.card` (dark surface, border, shadow). */
+  .slide .card{
+    background:transparent;border:0;border-radius:0;box-shadow:none;
+    padding-top:2vh;border-top:.2vh solid var(--ink);
+  }
+  .slide.dark .card{border-top-color:#f0eee9}
+
+  .card .label{
+    font-size:.85vw;letter-spacing:.28em;text-transform:uppercase;
+    font-weight:800;margin-bottom:1.5vh;color:var(--ink)
+  }
+  .slide.dark .card .label{color:#f0eee9}
+
+  .slide .card-y{border-top-color:var(--accent)}
+  .card-y .label{color:var(--ink)}
+  .slide.dark .card-y .label{color:var(--accent)}
+
+  /* ---------- LISTS ---------- */
+  ul.clean{list-style:none}
+  ul.clean li{
+    padding:1.3vh 0;border-bottom:1px solid var(--rule);
+    font-size:1.3vw;line-height:1.35;font-weight:500;
+  }
+  .slide.dark ul.clean li{border-bottom-color:var(--rule-d);color:#dad8d2}
+  ul.clean li b{font-weight:800}
+  ul.clean li:first-child{border-top:1px solid var(--rule)}
+  .slide.dark ul.clean li:first-child{border-top-color:var(--rule-d)}
+
+  /* ---------- TABLE ---------- */
+  table.cmp{width:100%;border-collapse:collapse;margin-top:1vh}
+  table.cmp th{
+    text-align:left;padding:1.4vh 1.2vw 1.4vh 0;
+    font-size:.8vw;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--muted);font-weight:800;border-bottom:1.5px solid var(--rule);
+  }
+  table.cmp td{
+    padding:1.6vh 1.2vw 1.6vh 0;
+    font-size:1.15vw;line-height:1.35;font-weight:500;
+    border-bottom:1px solid var(--rule);vertical-align:top;
+  }
+
+  /* ---------- HEADER SPACER ---------- */
+  .content{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0}
+
+  @media print{
+    body{background:#fff}
+    .slide{border:0}
+  }
+
+  /* ============================================================
+     MOBILE OVERRIDES
+     ============================================================ */
+  @media (max-width: 768px) {
+    .slide{
+      min-height:auto; height:auto;
+      padding: 5vh 6vw 5vh;
+      justify-content:flex-start;
+    }
+    .content{ flex:initial; justify-content:flex-start; }
+
+    .chapter{
+      position:relative; top:auto; left:auto;
+      font-size:.7rem; letter-spacing:.25em; margin-bottom:2.5vh;
+    }
+    .pageno{
+      position:relative; right:auto; bottom:auto;
+      font-size:.62rem; letter-spacing:.25em;
+      align-self:flex-end; margin-top:3vh;
+    }
+
+    .hero{ font-size:18vw; line-height:.95 }
+    h2.title{ font-size:9.5vw; line-height:1.1 }
+    h2.title-sm{ font-size:8vw; line-height:1.1 }
+    .lede{ font-size:5.5vw; line-height:1.15; max-width:none }
+    .subtitle{ font-size:1.05rem; line-height:1.35; max-width:none; margin-bottom:3vh }
+    .caption{ font-size:.92rem; line-height:1.45; padding-top:3vh }
+    .eyebrow{ font-size:.7rem; letter-spacing:.22em }
+    p.body, li.body{ font-size:1rem; line-height:1.45 }
+
+    .stat .n{ font-size:13vw; line-height:.9 }
+    .stat .l{ font-size:.7rem; letter-spacing:.22em }
+
+    .card .label{ font-size:.72rem; letter-spacing:.22em }
+    ul.clean li{ font-size:.95rem; line-height:1.4 }
+
+    table.cmp{ margin-top:1.5vh }
+    table.cmp td{
+      font-size:.92rem; line-height:1.35; font-weight:500;
+      padding:1.3vh .8rem 1.3vh 0;
+    }
+    table.cmp td:last-child{ padding-right:0; white-space:nowrap }
+    table.cmp td b{ font-weight:800; font-variant-numeric:tabular-nums }
+    table.cmp th{
+      font-size:.68rem; letter-spacing:.22em;
+      padding:1.2vh .8rem 1.2vh 0;
+    }
+
+    .grid-2, .grid-3, .grid-4{ grid-template-columns:1fr; gap:3.5vh }
+
+    [style*="font-size:.85vw"]  { font-size:.7rem !important }
+    [style*="font-size:.9vw"]   { font-size:.72rem !important }
+    [style*="font-size:.95vw"]  { font-size:.78rem !important }
+    [style*="font-size:1vw"]    { font-size:.82rem !important }
+    [style*="font-size:1.05vw"] { font-size:.85rem !important }
+    [style*="font-size:1.1vw"]  { font-size:.85rem !important }
+    [style*="font-size:1.15vw"] { font-size:.88rem !important }
+    [style*="font-size:1.2vw"]  { font-size:.9rem !important }
+    [style*="font-size:1.25vw"] { font-size:.92rem !important }
+    [style*="font-size:1.3vw"]  { font-size:.95rem !important }
+    [style*="font-size:1.4vw"]  { font-size:1rem !important }
+    [style*="font-size:1.5vw"]  { font-size:1.05rem !important }
+    [style*="font-size:1.6vw"]  { font-size:1.1rem !important }
+    [style*="font-size:1.7vw"]  { font-size:1.15rem !important }
+    [style*="font-size:1.9vw"]  { font-size:1.2rem !important }
+    [style*="font-size:2vw"]    { font-size:1.25rem !important }
+    [style*="font-size:2.2vw"]  { font-size:1.35rem !important }
+    [style*="font-size:2.4vw"]  { font-size:1.5rem !important }
+    [style*="font-size:3vw"]    { font-size:1.8rem !important }
+    [style*="font-size:3.5vw"]  { font-size:2.1rem !important }
+    [style*="font-size:3.8vw"]  { font-size:2.3rem !important }
+    [style*="font-size:4vw"]    { font-size:2.4rem !important }
+    [style*="font-size:5vw"]    { font-size:3rem !important }
+    [style*="font-size:7vw"]    { font-size:4rem !important }
+    [style*="font-size:14vw"]   { font-size:5.5rem !important }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============= 01 · COVER ============= -->
+<section class="slide dark">
+  <div class="content" style="justify-content:flex-start;padding-top:6vh">
+    <div class="hero">Switch.</div>
+    <div class="lede" style="margin-top:6vh;max-width:30ch">
+      On-demand workers.<br/>
+      <span class="hi">Commercial-first.</span>
+    </div>
+  </div>
+  <div class="pageno">01</div>
+</section>
+
+<!-- ============= 02 · THE WEDGE ============= -->
+<section class="slide cream">
+  <div class="chapter">01 · The Wedge</div>
+  <div class="content">
+    <h2 class="title">
+      Pronto and Snabbit cracked household.<br/>
+      We're doing it for <span class="hi">commercial.</span>
+    </h2>
+    <div class="subtitle">
+      10× the TAM. Higher take rate. No payroll. Same instant rails.
+    </div>
+    <div class="grid-4">
+      <div class="card card-y">
+        <div class="label">TAM</div>
+        <div style="font-size:2vw;font-weight:900;margin:1.2vh 0;line-height:1.1">₹1.5L cr</div>
+        <div style="color:var(--muted);font-size:1vw;line-height:1.4">Temp / on-demand labour — 10× household</div>
+      </div>
+      <div class="card card-y">
+        <div class="label">Supply</div>
+        <div style="font-size:2vw;font-weight:900;margin:1.2vh 0;line-height:1.1">No payroll</div>
+        <div style="color:var(--muted);font-size:1vw;line-height:1.4">Captain network + second-shift pool — scales horizontal</div>
+      </div>
+      <div class="card card-y">
+        <div class="label">Margin</div>
+        <div style="font-size:2vw;font-weight:900;margin:1.2vh 0;line-height:1.1">₹160 / shift</div>
+        <div style="color:var(--muted);font-size:1vw;line-height:1.4">27% gross · profitable shift one</div>
+      </div>
+      <div class="card card-y">
+        <div class="label">Customer</div>
+        <div style="font-size:2vw;font-weight:900;margin:1.2vh 0;line-height:1.1">5+ shifts</div>
+        <div style="color:var(--muted);font-size:1vw;line-height:1.4">B2B repeat in month one · cross-vertical</div>
+      </div>
+    </div>
+  </div>
+  <div class="pageno">02</div>
+</section>
+
+<!-- ============= 03 · TRACTION ============= -->
+<section class="slide dark">
+  <div class="chapter">02 · Traction</div>
+  <div class="content">
+    <h2 class="title" style="color:#f7f5f0">
+      50 → 400 hours/day.<br/>
+      <span class="hi">In three weeks.</span>
+    </h2>
+    <div class="subtitle">
+      90% B2B. Zero paid ads. Profitable from shift one.
+    </div>
+    <div class="grid-4" style="margin-bottom:5vh">
+      <div class="stat"><div class="n y">400</div><div class="l">worker-hrs / day</div></div>
+      <div class="stat"><div class="n y">90<span class="u">%</span></div><div class="l">commercial</div></div>
+      <div class="stat"><div class="n y">27<span class="u">%</span></div><div class="l">gross margin</div></div>
+      <div class="stat"><div class="n y">16×</div><div class="l">LTV/CAC · 12mo</div></div>
+    </div>
+    <div class="grid-3">
+      <div class="card card-y">
+        <div class="label" style="color:var(--accent)">Crax</div>
+        <div style="font-size:1.5vw;font-weight:700;color:#fff;margin:1vh 0;line-height:1.15">200K-sqft warehouse</div>
+        <div style="color:#bdbab4;font-size:1vw;line-height:1.4">15 loaders/day · 6 days/wk · 4 weeks consecutive · 90% fill in &lt;30 min</div>
+      </div>
+      <div class="card card-y">
+        <div class="label" style="color:var(--accent)">Dr Diet Healthy Kitchen</div>
+        <div style="font-size:1.5vw;font-weight:700;color:#fff;margin:1vh 0;line-height:1.15">8-outlet cloud kitchen</div>
+        <div style="color:#bdbab4;font-size:1vw;line-height:1.4">50+ shifts/wk · 80% worker repeat · dinner-rush coverage</div>
+      </div>
+      <div class="card card-y">
+        <div class="label" style="color:var(--accent)">Sheffy</div>
+        <div style="font-size:1.5vw;font-weight:700;color:#fff;margin:1vh 0;line-height:1.15">600-guest event</div>
+        <div style="color:#bdbab4;font-size:1vw;line-height:1.4">38 servers + 6 captains · zero no-shows</div>
+      </div>
+    </div>
+  </div>
+  <div class="caption" style="color:#bdbab4">40+ B2B accounts in active pipeline · ~₹1.2 cr/month run-rate potential at current pricing.</div>
+  <div class="pageno">03</div>
+</section>
+
+<!-- ============= 04 · UNIT ECONOMICS ============= -->
+<section class="slide">
+  <div class="chapter">03 · Unit Economics</div>
+  <div class="content">
+    <h2 class="title">
+      Profitable from <span class="hi">shift one.</span>
+    </h2>
+    <div class="subtitle">
+      ₹160 contribution per 4-hour shift. CAC payback under one month. No subsidy DNA.
+    </div>
+    <div class="grid-2">
+      <div>
+        <div class="eyebrow">Per shift · 4 hours avg</div>
+        <table class="cmp">
+          <tr><td>Customer pays</td><td style="text-align:right"><b>₹600</b></td></tr>
+          <tr><td>Worker earns</td><td style="text-align:right">₹400</td></tr>
+          <tr><td>Gross take</td><td style="text-align:right"><b>₹200 · 33%</b></td></tr>
+          <tr><td>Variable ops · payout, KYC, SMS</td><td style="text-align:right">₹40</td></tr>
+          <tr><td><b>Contribution / shift</b></td><td style="text-align:right"><b>₹160 · 27%</b></td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="eyebrow">Per customer · LTV</div>
+        <table class="cmp">
+          <tr><td>Shifts / customer · today (3 wks)</td><td style="text-align:right">5</td></tr>
+          <tr><td>Shifts / customer / month · steady state</td><td style="text-align:right"><b>25</b></td></tr>
+          <tr><td>Contribution / customer · monthly</td><td style="text-align:right"><b>₹4,000</b></td></tr>
+          <tr><td>CAC · founder-led ground sales</td><td style="text-align:right">~₹3,000</td></tr>
+          <tr><td>Payback period</td><td style="text-align:right"><b>&lt;1 month</b></td></tr>
+          <tr><td><b>LTV / CAC · 12-mo lifetime</b></td><td style="text-align:right"><b>16×</b></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="caption">Pricing live at ₹100/hr promo; ₹150/hr steady-state assumed above. <b style="color:var(--ink)">Contribution-positive shift one. Pays back CAC inside one month.</b></div>
+  <div class="pageno">04</div>
+</section>
+
+<!-- ============= 05 · TEAM ============= -->
+<section class="slide cream">
+  <div class="chapter">04 · Team</div>
+  <div class="content">
+    <h2 class="title">
+      <span class="hi">Team.</span>
+    </h2>
+    <div class="subtitle">
+      Two repeat operators with the exact prior careers this problem demands.
+    </div>
+    <div class="grid-2">
+      <div class="card card-y">
+        <div class="label">Saurabh Pandey · Founder &amp; CEO</div>
+        <p class="body" style="margin-top:1.5vh;font-size:1.25vw">
+          Founded <b>Mavex.ai</b> — raised seed, built, shipped to enterprise. Second-time founder.
+          <b>Six months on the ground</b> in Gurgaon: knows every warehouse manager and cloud kitchen ops head by name.
+          Computer Science, <b>Delhi College of Engineering</b>.
+        </p>
+      </div>
+      <div class="card card-y">
+        <div class="label">Ateev Bhardwaj · Head of Ops &amp; Business</div>
+        <p class="body" style="margin-top:1.5vh;font-size:1.25vw">
+          Built and ran a coliving brand to <b>$2M ARR over 10 years</b>. Best-in-class at managing people at scale — the exact muscle blue-collar workforce ops demands.
+          Owns supply, captain network, KYC, no-show rate.
+        </p>
+      </div>
+    </div>
+    <div style="margin-top:4.5vh;padding-top:3vh;border-top:1px solid var(--rule)">
+      <div class="eyebrow" style="margin-bottom:2vh">Operating team</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2.5vw">
+        <div>
+          <div style="font-size:1.3vw;font-weight:800">Shourya</div>
+          <div style="font-size:.95vw;color:var(--muted);margin-top:.5vh;letter-spacing:.04em">Product</div>
+        </div>
+        <div>
+          <div style="font-size:1.3vw;font-weight:800">Aryan</div>
+          <div style="font-size:.95vw;color:var(--muted);margin-top:.5vh;letter-spacing:.04em">B2B Demand &amp; Sales</div>
+        </div>
+        <div>
+          <div style="font-size:1.3vw;font-weight:800">Rani</div>
+          <div style="font-size:.95vw;color:var(--muted);margin-top:.5vh;letter-spacing:.04em">Marketing</div>
+        </div>
+        <div>
+          <div style="font-size:1.3vw;font-weight:800">Suhani</div>
+          <div style="font-size:.95vw;color:var(--muted);margin-top:.5vh;letter-spacing:.04em">Ops</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pageno">05</div>
+</section>
+
+<!-- ============= 06 · WHAT'S NEXT ============= -->
+<section class="slide dark">
+  <div class="chapter">05 · What's Next</div>
+  <div class="content">
+    <h2 class="title" style="color:#f7f5f0">
+      Path to <span class="hi">Series A.</span>
+    </h2>
+    <div class="subtitle">
+      Year 1. Delhi NCR. Default labour platform for commercial India.
+    </div>
+    <div class="grid-3" style="margin-top:5vh">
+      <div class="card card-y">
+        <div class="label" style="color:var(--accent)">Scale</div>
+        <div style="font-size:2vw;font-weight:900;color:#fff;margin:1vh 0;line-height:1.1">20,000 worker-hours / day</div>
+        <div style="color:#bdbab4;font-size:1vw;line-height:1.4">Delhi NCR</div>
+      </div>
+      <div class="card card-y">
+        <div class="label" style="color:var(--accent)">Repeat</div>
+        <div style="font-size:2vw;font-weight:900;color:#fff;margin:1vh 0;line-height:1.1">40% recurring</div>
+        <div style="color:#bdbab4;font-size:1vw;line-height:1.4">Shifts from repeat B2B accounts</div>
+      </div>
+      <div class="card card-y">
+        <div class="label" style="color:var(--accent)">Margin</div>
+        <div style="font-size:2vw;font-weight:900;color:#fff;margin:1vh 0;line-height:1.1">Contribution-positive</div>
+        <div style="color:#bdbab4;font-size:1vw;line-height:1.4">Across the portfolio</div>
+      </div>
+    </div>
+  </div>
+  <div class="caption" style="color:#bdbab4">
+    <span style="color:#fff;font-weight:700">saurabh@switchlocally.com</span> &nbsp;·&nbsp; switchlocally.com
+  </div>
+  <div class="pageno">06</div>
+</section>
+
+</body>
+</html>

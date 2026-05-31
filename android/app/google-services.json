@@ -1,0 +1,191 @@
+{
+  "project_info": {
+    "project_number": "616412616901",
+    "firebase_url": "https://hearus-4f2fe-default-rtdb.firebaseio.com",
+    "project_id": "hearus-4f2fe",
+    "storage_bucket": "hearus-4f2fe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616412616901:android:3507e7df4156c2591478ac",
+        "android_client_info": {
+          "package_name": "com.example.hearus_console"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "616412616901-6a4narfeqd9rulsrk69q14egsqdvf2hq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBamTPwG8oxhmB_Pzs_gz8vZ6HfnIq2HwE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "616412616901-6a4narfeqd9rulsrk69q14egsqdvf2hq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "616412616901-amu8ccndl7jqhq05uu9tb0osuh62ng7l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mavex.mavyai"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616412616901:android:dd618d8adf3aa0371478ac",
+        "android_client_info": {
+          "package_name": "com.switchlocally.worker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "616412616901-6a4narfeqd9rulsrk69q14egsqdvf2hq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBamTPwG8oxhmB_Pzs_gz8vZ6HfnIq2HwE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "616412616901-6a4narfeqd9rulsrk69q14egsqdvf2hq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "616412616901-amu8ccndl7jqhq05uu9tb0osuh62ng7l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mavex.mavyai"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616412616901:android:ba032bb8f39cbfad1478ac",
+        "android_client_info": {
+          "package_name": "me.hearus.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "616412616901-4ah94nfgvj35ducr6ia64cn4hqg6v3cp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.hearus.app",
+            "certificate_hash": "93009b39779fa0a2a5286158863b8a6bb71e1a0b"
+          }
+        },
+        {
+          "client_id": "616412616901-4ur57s7mavnt1b6fse858ma09c72bud4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.hearus.app",
+            "certificate_hash": "763dfadf9802a9e53ee57d88b850e02e8982c7c9"
+          }
+        },
+        {
+          "client_id": "616412616901-6lonckn4klvqm4qg1vtlb2m2kal4qjse.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.hearus.app",
+            "certificate_hash": "1196d792aca8f2486fc068a03f5abda9d0d0fe50"
+          }
+        },
+        {
+          "client_id": "616412616901-7gt3vgu3j9a675dicmq1cit2n53bdu9g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.hearus.app",
+            "certificate_hash": "163e306a92beada81599d08b66364959b27207fe"
+          }
+        },
+        {
+          "client_id": "616412616901-7iio5nspukuqla99bestu9e7919jknrd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.hearus.app",
+            "certificate_hash": "09635ec7578bfdfb577a95c811efe75663cd8b61"
+          }
+        },
+        {
+          "client_id": "616412616901-825orpuu26p3ll19fqauusp1ddap6gqn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.hearus.app",
+            "certificate_hash": "538ee606266037c320262a8f7d54a50264e6cf13"
+          }
+        },
+        {
+          "client_id": "616412616901-a6dtj4qgdjuaer4eiauf7k5bta5po5fu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.hearus.app",
+            "certificate_hash": "ad1ad8ece311da76ed764bb8bd65ed35841c5829"
+          }
+        },
+        {
+          "client_id": "616412616901-h67cj7jugpcid9e280jprhkjkp51hfob.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.hearus.app",
+            "certificate_hash": "cb55df1dfa02819f5453d8bfc1e01d59fa29dc4b"
+          }
+        },
+        {
+          "client_id": "616412616901-la3m90gt0l4dr0tj1oklp97ilsups8s8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.hearus.app",
+            "certificate_hash": "d4c1aeaeac3ff3229a80361b2d4b63e5e585b1ee"
+          }
+        },
+        {
+          "client_id": "616412616901-6a4narfeqd9rulsrk69q14egsqdvf2hq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBamTPwG8oxhmB_Pzs_gz8vZ6HfnIq2HwE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "616412616901-6a4narfeqd9rulsrk69q14egsqdvf2hq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "616412616901-amu8ccndl7jqhq05uu9tb0osuh62ng7l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mavex.mavyai"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

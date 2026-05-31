@@ -1,0 +1,7 @@
+{
+  "crons": [
+    { "path": "/api/cron/reconcile-payments",     "schedule": "0 3 * * *" },
+    { "path": "/api/cron/purge-deleted",          "schedule": "0 4 * * *" },
+    { "path": "/api/cron/expire-unfilled-shifts", "schedule": "30 16 * * *" }
+  ]
+}

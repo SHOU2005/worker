@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Full-screen dark gradient backdrop — same #0B0B18 base the worker
+     app uses for cards + the lock-screen install gate, with a subtle
+     deep-violet sheen at the top so the card has presence. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="rectangle">
+    <gradient
+        android:type="linear"
+        android:angle="270"
+        android:startColor="#1B0F2E"
+        android:centerColor="#0B0B18"
+        android:endColor="#000000" />
+</shape>

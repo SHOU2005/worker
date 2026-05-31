@@ -1,0 +1,84 @@
+apply plugin: 'com.android.application'
+// Kotlin needed for UrgentRingService / IncomingJobActivity / UrgentRingForegroundService.
+apply plugin: 'kotlin-android'
+
+android {
+
+    signingConfigs {
+        release {
+            def props = new Properties()
+            def propsFile = rootProject.file("signing.properties")
+            if (propsFile.exists()) { props.load(new FileInputStream(propsFile)) }
+            // Only set storeFile when a real path is provided. Without this
+            // guard the empty-string fallback hit `file("")` and aborted
+            // Gradle configuration before any task ran — which broke debug
+            // builds too, since Gradle evaluates the whole script regardless
+            // of which buildType you target.
+            def storeFilePath = props["storeFile"]
+            if (storeFilePath) { storeFile file(storeFilePath) }
+            storePassword (props["storePassword"] ?: "")
+            keyAlias (props["keyAlias"] ?: "")
+            keyPassword (props["keyPassword"] ?: "")
+        }
+    }
+
+    namespace = "com.switchlocally.worker"
+    compileSdk = 36
+    defaultConfig {
+        applicationId "com.switchlocally.worker"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 16
+        versionName "2.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    // Kotlin stdlib for the urgent-ring service. Version pinned in root
+    // build.gradle (2.0.21 to match Gradle's bundled Kotlin).
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21"
+    // Firebase BoM keeps every Firebase artifact on a tested matching
+    // version. messaging is the only one we need natively — the rest of
+    // the app (auth, etc.) still goes through the JS SDK in the webview.
+    implementation platform('com.google.firebase:firebase-bom:33.1.2')
+    implementation 'com.google.firebase:firebase-messaging-ktx'
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Switch Captain</string>
+    <string name="title_activity_main">Switch Captain</string>
+    <string name="package_name">com.switchlocally.captain</string>
+    <string name="custom_url_scheme">com.switchlocally.captain</string>
+</resources>

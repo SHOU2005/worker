@@ -1,0 +1,614 @@
+// Switch — Prisma schema mapped onto the Railway Postgres database.
+//
+// The Railway DB hosts both the legacy Switch tables (jobs, placements, swipe_events …)
+// and the new Next.js app's tables. This schema only declares the new-app tables;
+// the legacy tables are left untouched and accessed (if at all) via raw SQL.
+//
+// Naming convention: model + field names stay in camelCase so existing TS code
+// keeps working. @@map / @map directives bridge to the snake_case columns and
+// the *_v2 / *_bytes column suffixes that exist in the database.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                 String           @id @default(cuid())
+  name               String
+  // Phone is no longer globally unique — the same number can hold a
+  // separate WORKER account and EMPLOYER account in parallel (or any
+  // other combination across roles). Uniqueness is enforced on the
+  // composite (phone, role) further down.
+  phone              String
+  email              String?          @unique
+  password           String           @default("")
+  avatar             String?          @map("photo_url")
+  avatarBytes        Bytes?           @map("avatar_bytes")
+  avatarMime         String?          @map("avatar_mime")
+  isActive           Boolean          @default(true) @map("is_active")
+  fcmToken           String?          @map("fcm_token")        // legacy single-device, kept for back-compat reads/writes
+  fcmTokens          String[]         @default([]) @map("fcm_tokens")
+  tokenVersion       Int              @default(0)   @map("token_version")
+  createdAt          DateTime         @default(now()) @map("created_at_v2")
+  updatedAt          DateTime         @updatedAt    @map("updated_at_v2")
+  // DPDP §12: soft delete + 30-day grace period before hard delete.
+  deletedAt          DateTime?        @map("deleted_at")
+  captainReferralId  String?          @map("captain_referral_id")
+  role               Role             @default(WORKER)
+
+  bookingsAsEmployer Booking[]        @relation("EmployerBookings")
+  captainProfile     CaptainProfile?
+  employerProfile    EmployerProfile?
+  notifications      Notification[]
+  opsProfile         OpsProfile?
+  ratingsGiven       Rating[]         @relation("RatingsGiven")
+  workerProfile      WorkerProfile?
+  jyotiMemory        JyotiMemory?
+
+  @@unique([phone, role], map: "users_phone_role_key")
+  @@index([phone])
+  @@index([role])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  title     String
+  body      String
+  data      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@map("notifications_v2")
+}
+
+// Jyoti's memory of a worker — what makes her feel like a friend who
+// remembers instead of a fresh stranger on every call. One row per worker
+// (keyed by userId). After each voice/phone conversation the transcript is
+// summarised (see lib/jyoti-memory.ts) and folded back into `summary`, so
+// the next call can open with continuity ("kal waali shift kaisi rahi?").
+//
+// We deliberately store a SUMMARY, not raw transcripts: it keeps the row
+// small, bounds what we feed back into the agent prompt, and avoids holding
+// verbatim recordings of a vulnerable user's speech longer than needed.
+model JyotiMemory {
+  id           String    @id @default(cuid())
+  userId       String    @unique @map("user_id")
+
+  // Rolling natural-language summary of who this worker is and what's
+  // happened across past calls. Kept short (~1500 chars) — the updater
+  // re-summarises and compresses rather than appending forever.
+  summary      String    @default("") @db.Text
+
+  // Coarse emotional read from the last call, so Jyoti can adjust tone on
+  // the next one. Free-text but typically: happy | tired | stressed |
+  // frustrated | anxious | neutral. Empty until the first call is summarised.
+  mood         String?
+
+  // Structured-ish facts worth recalling by name: preferred form of address,
+  // family mentions, recurring problems, languages, etc. JSON string so the
+  // shape can evolve without a migration.
+  facts        String?   @db.Text
+
+  callCount    Int       @default(0) @map("call_count")
+  lastCallAt   DateTime? @map("last_call_at")
+  lastSummaryAt DateTime? @map("last_summary_at")
+
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  user         User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("jyoti_memory")
+}
+
+model EmployerProfile {
+  id                String    @id @default(cuid())
+  userId            String    @unique @map("user_id")
+  ownerName         String?   @map("owner_name")
+  companyName       String?   @map("company_name")
+  businessType      String?   @map("business_type")
+  address           String?
+  flat              String?   @map("address_flat")
+  tower             String?   @map("address_tower")
+  city              String?   @map("city_v2")
+  logo              String?
+  logoBytes         Bytes?    @map("logo_bytes")
+  logoMime          String?   @map("logo_mime")
+  lat               Float?
+  lng               Float?
+  gstNumber         String?   @map("gst_number")
+  totalShifts       Int       @default(0) @map("total_shifts")
+  rating            Float     @default(0) @map("rating_v2")
+  captainReferralId String?   @map("captain_referral_id")
+  verifiedByOpsAt   DateTime? @map("verified_by_ops_at")
+  deletedAt         DateTime? @map("deleted_at")
+  // Wallet balance stored in paise to avoid floating-point drift on
+  // every charge / refund.  Read as `walletBalance / 100` for display.
+  walletBalance     Int       @default(0) @map("wallet_balance")
+
+  user              User                  @relation(fields: [userId], references: [id])
+  shifts            Shift[]
+  walletTxns        WalletTransaction[]
+
+  @@index([city])
+  @@index([userId])
+  @@index([deletedAt])
+  @@map("employer_profiles")
+}
+
+// Ledger row for every wallet movement. Top-ups create a PENDING row with
+// razorpayOrderId; the verify endpoint flips it to COMPLETED and increments
+// EmployerProfile.walletBalance in the same transaction so the two never
+// drift apart. Debits are negative.
+model WalletTransaction {
+  id                String   @id @default(cuid())
+  employerProfileId String   @map("employer_profile_id")
+  type              String   // 'TOPUP' | 'DEBIT' | 'REFUND' | 'BONUS'
+  amount            Int      // paise — positive for credits, negative for debits
+  status            String   @default("PENDING") // 'PENDING' | 'COMPLETED' | 'FAILED'
+  razorpayOrderId   String?  @unique @map("razorpay_order_id")
+  razorpayPaymentId String?  @map("razorpay_payment_id")
+  bookingId         String?  @map("booking_id")
+  description       String?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt    @map("updated_at")
+
+  employer          EmployerProfile @relation(fields: [employerProfileId], references: [id])
+
+  @@index([employerProfileId, createdAt])
+  @@index([razorpayOrderId])
+  @@map("wallet_transactions")
+}
+
+model WorkerProfile {
+  id                     String         @id @default(cuid())
+  userId                 String         @unique @map("user_id")
+  // Profile photo — new uploads can either be a Supabase Storage URL (legacy
+  // `profilePhoto` field) or a bytea blob in this DB (`profilePhotoBytes`).
+  profilePhoto           String?        @map("profile_photo")
+  profilePhotoBytes      Bytes?         @map("profile_photo_bytes")
+  profilePhotoMime       String?        @map("profile_photo_mime")
+
+  // Aadhaar — number is AES-256-GCM encrypted (see lib/crypto.ts).
+  // Image storage migrated from Supabase signed URLs (aadhaarFront/aadhaarBack)
+  // to bytea (aadhaarFrontBytes/aadhaarBackBytes). Both pairs live side-by-side
+  // until every upload path has been moved to bytea.
+  aadhaarNumber          String?        @map("aadhaar_number")
+  aadhaarLast4           String?        @map("aadhaar_last4")
+  aadhaarFront           String?        @map("aadhaar_front")
+  aadhaarFrontBytes      Bytes?         @map("aadhaar_front_bytes")
+  aadhaarFrontMime       String?        @map("aadhaar_front_mime")
+  aadhaarBack            String?        @map("aadhaar_back")
+  aadhaarBackBytes       Bytes?         @map("aadhaar_back_bytes")
+  aadhaarBackMime        String?        @map("aadhaar_back_mime")
+  aadhaarConsentVersion  String?        @map("aadhaar_consent_version")
+  aadhaarConsentAt       DateTime?      @map("aadhaar_consent_at")
+  aadhaarConsentIp       String?        @map("aadhaar_consent_ip")
+  aadhaarVerified        Boolean        @default(false) @map("aadhaar_verified")
+  videoVerified          Boolean        @default(false) @map("video_verified")
+
+  skills                 String[]       @default([]) @map("skills_v2")
+  city                   String?
+  lat                    Float?         @map("lat_v2")
+  lng                    Float?         @map("lng_v2")
+  lastSeenAt             DateTime?      @map("last_seen_at")
+  // Default ON — workers need to be trackable while on shift; toggle is gated server-side.
+  locationSharingConsent Boolean        @default(true) @map("location_sharing_consent")
+  hourlyRate             Float          @default(100) @map("hourly_rate_v2")
+  rating                 Float          @default(0)   @map("rating_v2")
+  totalShifts            Int            @default(0)    @map("total_shifts")
+  totalEarnings          Float          @default(0)    @map("total_earnings")
+  isAvailable            Boolean        @default(true) @map("is_available")
+  bio                    String?
+  upiId                  String?        @map("upi_id")
+  captainReferralId      String?        @map("captain_referral_id")
+  kycStatus              KycStatus      @default(PENDING) @map("kyc_status")
+  milestoneLevel         Int            @default(0)    @map("milestone_level")
+  contacts               String?
+  deletedAt              DateTime?      @map("deleted_at")
+
+  bookings               Booking[]
+  ratings                Rating[]       @relation("WorkerRatings")
+  user                   User           @relation(fields: [userId], references: [id])
+
+  @@index([city])
+  @@index([kycStatus])
+  @@index([userId])
+  @@index([lastSeenAt])
+  @@index([city, kycStatus])
+  @@index([deletedAt])
+  @@map("user_profiles")
+}
+
+model Shift {
+  id                String          @id @default(cuid())
+  employerProfileId String          @map("employer_profile_id")
+  title             String
+  role              String
+  description       String?
+  address           String
+  city              String
+  lat               Float?
+  lng               Float?
+  // Google Maps share link (or any deep-link URL) for the exact spot. OPS pastes
+  // it when posting; the worker app shows it as a tappable "Open in Maps" link.
+  mapLink           String?         @map("map_link")
+  date              DateTime
+  startTime         String          @map("start_time")
+  // End time is optional — open-ended shifts run until the worker checks out.
+  // When null, the UI shows "Until completed" and earnings are computed from
+  // actual hours worked (checkOutTime - checkInTime) at completion.
+  endTime           String?         @map("end_time")
+  duration          Float
+  workersNeeded     Int             @default(1)   @map("workers_needed")
+  hourlyRate        Float           @default(200) @map("hourly_rate")
+  isUrgent          Boolean         @default(false) @map("is_urgent")
+  urgentFee         Float           @default(0)    @map("urgent_fee")
+  paymentStatus     PaymentStatus   @default(PENDING) @map("payment_status")
+  paymentAmount     Float?          @map("payment_amount")
+  razorpayOrderId   String?         @map("razorpay_order_id")
+  razorpayPaymentId String?         @map("razorpay_payment_id")
+  paidAt            DateTime?       @map("paid_at")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt    @map("updated_at")
+  status            ShiftStatus     @default(OPEN)
+
+  bookings          Booking[]
+  employer          EmployerProfile @relation(fields: [employerProfileId], references: [id])
+
+  @@index([city, date])
+  @@index([lat, lng])
+  @@index([status, date])
+  @@index([employerProfileId, status])
+  @@index([role, city, status])
+  @@map("shifts_v2")
+}
+
+model Booking {
+  id              String        @id @default(cuid())
+  shiftId         String        @map("shift_id")
+  workerProfileId String        @map("worker_profile_id")
+  employerId      String        @map("employer_id")
+  totalAmount     Float         @map("total_amount")
+  platformFee    Float         @map("platform_fee")
+  workerEarning   Float         @map("worker_earning")
+  paymentId       String?       @map("payment_id")
+  checkInTime     DateTime?     @map("check_in_time")
+  checkOutTime    DateTime?     @map("check_out_time")
+  notes           String?
+  cancelReason    String?       @map("cancel_reason")
+  cancelledAt     DateTime?     @map("cancelled_at")
+  arrivalSelfie     Bytes?      @map("arrival_selfie")
+  arrivalSelfieMime String?     @map("arrival_selfie_mime")
+  arrivalSelfieAt   DateTime?   @map("arrival_selfie_at")
+  appliedAt       DateTime?     @default(now()) @map("applied_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt    @map("updated_at")
+  status          BookingStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING) @map("payment_status")
+  idempotencyKey  String?       @unique @map("idempotency_key")
+
+  employer        User          @relation("EmployerBookings", fields: [employerId], references: [id])
+  shift           Shift         @relation(fields: [shiftId], references: [id])
+  worker          WorkerProfile @relation(fields: [workerProfileId], references: [id])
+  commission      Commission?
+  payment         Payment?
+  ratings         Rating[]
+
+  @@index([shiftId])
+  @@index([shiftId, status])
+  @@index([workerProfileId])
+  @@index([workerProfileId, status])
+  @@index([employerId])
+  @@index([paymentStatus])
+  @@index([status, createdAt])
+  @@index([employerId, status])
+  @@map("bookings_v2")
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  bookingId         String        @unique @map("booking_id")
+  razorpayOrderId   String?       @map("razorpay_order_id")
+  razorpayPaymentId String?       @map("razorpay_payment_id")
+  amount            Float
+  currency          String        @default("INR")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  status            PaymentStatus @default(PENDING)
+
+  booking           Booking       @relation(fields: [bookingId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([razorpayOrderId])
+  @@index([razorpayPaymentId])
+  @@map("payments_v2")
+}
+
+model Rating {
+  id              String         @id @default(cuid())
+  bookingId       String         @map("booking_id")
+  ratedById       String         @map("rated_by_id")
+  targetRole      RatingTarget   @default(WORKER) @map("target_role")
+  workerProfileId String?        @map("worker_profile_id")
+  targetUserId    String?        @map("target_user_id")
+  score           Int
+  comment         String?
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  bookingRef      Booking        @relation(fields: [bookingId], references: [id])
+  ratedBy         User           @relation("RatingsGiven", fields: [ratedById], references: [id])
+  worker          WorkerProfile? @relation("WorkerRatings", fields: [workerProfileId], references: [id])
+
+  @@unique([bookingId, ratedById])
+  @@index([targetUserId])
+  @@map("ratings_v2")
+}
+
+enum RatingTarget {
+  WORKER
+  EMPLOYER
+}
+
+// User-initiated data deletion request (DPDP Act §12).
+model DataDeletionRequest {
+  id          String    @id @default(cuid())
+  userId      String    @map("user_id")
+  reason      String?
+  status      String    @default("PENDING")
+  requestedAt DateTime  @default(now()) @map("requested_at")
+  completedAt DateTime? @map("completed_at")
+  notes       String?
+
+  @@index([status, requestedAt])
+  @@index([userId])
+  @@map("data_deletion_requests")
+}
+
+// Audit trail for Ops viewing Aadhaar / KYC documents (UIDAI + DPDP Act compliance).
+model AadhaarAccessLog {
+  id              String   @id @default(cuid())
+  workerProfileId String   @map("worker_profile_id")
+  accessedById    String   @map("accessed_by_id")
+  fieldsViewed    String[] @map("fields_viewed")
+  reason          String?
+  ip              String?
+  userAgent       String?  @map("user_agent")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([workerProfileId])
+  @@index([accessedById])
+  @@index([createdAt])
+  @@map("aadhaar_access_logs")
+}
+
+model Complaint {
+  id          String    @id @default(cuid())
+  bookingId   String?   @map("booking_id")
+  reportedBy  String    @map("reported_by")
+  against     String
+  type        String
+  description String
+  status      String    @default("OPEN")
+  resolution  String?
+  source      String    @default("manual") @map("source")
+  transcript  Json?     @map("transcript")
+  opsAssigned String?   @map("ops_assigned_user_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  resolvedAt  DateTime? @map("resolved_at")
+
+  @@index([reportedBy, createdAt])
+  @@index([status, createdAt])
+  @@map("complaints_v2")
+}
+
+model OtpLog {
+  id        String   @id @default(cuid())
+  phone     String
+  otp       String
+  expiresAt DateTime @map("expires_at")
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([phone])
+  @@index([phone, verified, createdAt])
+  @@map("otp_verifications_v2")
+}
+
+model CaptainProfile {
+  id            String              @id @default(cuid())
+  userId        String              @unique @map("user_id")
+  referralCode  String              @unique @map("referral_code")
+  territory     String?
+  totalEarnings Float               @default(0) @map("total_earnings")
+  pendingPayout Float               @default(0) @map("pending_payout")
+  joinedAt      DateTime            @default(now()) @map("joined_at")
+  status        CaptainStatus       @default(PENDING)
+  lat           Float?
+  lng           Float?
+  lastSeenAt    DateTime?           @map("last_seen_at")
+  contacts      String?
+  deletedAt     DateTime?           @map("deleted_at")
+
+  attendances   CaptainAttendance[]
+  user          User                @relation(fields: [userId], references: [id])
+  tasks         CaptainTask[]
+  commissions   Commission[]
+
+  @@index([status])
+  @@index([territory])
+  @@map("captain_profiles")
+}
+
+model Commission {
+  id               String           @id @default(cuid())
+  captainProfileId String           @map("captain_profile_id")
+  bookingId        String           @unique @map("booking_id")
+  amount           Float            @default(100)
+  paidAt           DateTime?        @map("paid_at")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  status           CommissionStatus @default(PENDING)
+
+  booking          Booking          @relation(fields: [bookingId], references: [id])
+  captain          CaptainProfile   @relation(fields: [captainProfileId], references: [id])
+
+  @@index([captainProfileId, status])
+  @@map("commissions")
+}
+
+model CaptainTask {
+  id               String         @id @default(cuid())
+  captainProfileId String         @map("captain_profile_id")
+  assignedByUserId String         @map("assigned_by_user_id")
+  title            String
+  description      String?
+  dueDate          DateTime?      @map("due_date")
+  completedAt      DateTime?      @map("completed_at")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  status           TaskStatus     @default(OPEN)
+
+  captain          CaptainProfile @relation(fields: [captainProfileId], references: [id])
+
+  @@index([captainProfileId, status])
+  @@map("captain_tasks")
+}
+
+model CaptainAttendance {
+  id               String         @id @default(cuid())
+  captainProfileId String         @map("captain_profile_id")
+  date             DateTime
+  checkInTime      DateTime?      @map("check_in_time")
+  checkInLat       Float?         @map("check_in_lat")
+  checkInLng       Float?         @map("check_in_lng")
+  checkOutTime     DateTime?      @map("check_out_time")
+  checkOutLat      Float?         @map("check_out_lat")
+  checkOutLng      Float?         @map("check_out_lng")
+
+  captain          CaptainProfile @relation(fields: [captainProfileId], references: [id])
+
+  @@index([captainProfileId, date])
+  @@map("captain_attendances")
+}
+
+model OpsProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique @map("user_id")
+  permissions String[] @default([])
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("ops_profiles")
+}
+
+model BroadcastLog {
+  id           String   @id @default(cuid())
+  sentByUserId String   @map("sent_by_user_id")
+  title        String
+  body         String
+  targetRole   String?  @map("target_role")
+  targetCity   String?  @map("target_city")
+  sentCount    Int      @default(0) @map("sent_count")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("broadcast_logs")
+}
+
+model PlatformSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("platform_settings")
+}
+
+model Withdrawal {
+  id          String           @id @default(cuid())
+  workerId    String           @map("worker_id")
+  // Encrypted at rest (AES-256-GCM, base64). Use lib/crypto.ts.
+  upiId       String           @map("upi_id")
+  amount      Float
+  status      WithdrawalStatus @default(PENDING)
+  notes       String?
+  requestedAt DateTime         @default(now()) @map("requested_at")
+  processedAt DateTime?        @map("processed_at")
+  utr         String?
+
+  @@index([workerId, requestedAt])
+  @@index([workerId, status])
+  @@index([status, requestedAt])
+  @@map("withdrawals")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum CaptainStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+}
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  PAID
+}
+
+enum KycStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum Role {
+  WORKER
+  EMPLOYER
+  CAPTAIN
+  OPS
+  ADMIN
+}
+
+enum ShiftStatus {
+  OPEN
+  SEARCHING
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskStatus {
+  OPEN
+  COMPLETED
+}
+
+enum WithdrawalStatus {
+  PENDING
+  PROCESSING
+  PAID
+  REJECTED
+}

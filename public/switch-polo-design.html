@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Switch — Employee Polo Design</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #F0F0F0;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px;
+    gap: 60px;
+  }
+  .header {
+    text-align: center;
+  }
+  .header h1 { font-size: 13px; font-weight: 700; letter-spacing: 0.15em; color: #888; text-transform: uppercase; margin-bottom: 6px; }
+  .header h2 { font-size: 28px; font-weight: 900; color: #111; letter-spacing: -0.5px; }
+
+  .views {
+    display: flex;
+    gap: 80px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .view-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .view-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #999;
+    text-transform: uppercase;
+  }
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 560px;
+    width: 100%;
+  }
+  .detail-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid #E5E5E5;
+  }
+  .detail-card .label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #999;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .detail-card .value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+  }
+  .swatch { width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); }
+  .swatch-row { display: flex; gap: 8px; align-items: center; }
+  .swatch-name { font-size: 13px; font-weight: 600; color: #555; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Employee Uniform</h1>
+  <h2>Switch Polo T-Shirt</h2>
+</div>
+
+<div class="views">
+
+  <!-- FRONT VIEW -->
+  <div class="view-wrap">
+    <svg width="280" height="320" viewBox="0 0 280 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Drop shadow -->
+      <ellipse cx="140" cy="312" rx="80" ry="8" fill="rgba(0,0,0,0.10)"/>
+
+      <!-- Body -->
+      <path d="M52 88 L28 108 L44 180 L56 180 L56 300 Q56 308 64 308 L216 308 Q224 308 224 300 L224 180 L236 180 L252 108 L228 88 Q214 106 200 112 Q172 122 140 122 Q108 122 80 112 Q66 106 52 88Z" fill="#111111"/>
+
+      <!-- Sleeve left -->
+      <path d="M52 88 Q38 78 24 76 L8 120 L28 128 L44 104 Z" fill="#111111"/>
+      <!-- Sleeve right -->
+      <path d="M228 88 Q242 78 256 76 L272 120 L252 128 L236 104 Z" fill="#111111"/>
+
+      <!-- Collar -->
+      <path d="M104 90 Q118 130 140 134 Q162 130 176 90 Q162 84 152 82 L148 100 Q144 108 140 108 Q136 108 132 100 L128 82 Q118 84 104 90Z" fill="#1A1A1A"/>
+      <!-- Collar highlight -->
+      <path d="M108 92 Q120 126 140 130 Q160 126 172 92" stroke="rgba(255,255,255,0.06)" stroke-width="1" fill="none"/>
+
+      <!-- Button placket -->
+      <rect x="137" y="108" width="6" height="40" rx="3" fill="#1C1C1C"/>
+      <!-- Buttons -->
+      <circle cx="140" cy="118" r="2.5" fill="#2A2A2A" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+      <circle cx="140" cy="128" r="2.5" fill="#2A2A2A" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+      <circle cx="140" cy="138" r="2.5" fill="#2A2A2A" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+
+      <!-- LEFT CHEST LOGO -->
+      <!-- Logo background rounded square -->
+      <rect x="72" y="148" width="38" height="38" rx="10" fill="white"/>
+      <!-- S letter -->
+      <text x="91" y="174" font-family="DM Sans, sans-serif" font-size="22" font-weight="900" fill="#111111" text-anchor="middle" letter-spacing="-1">S</text>
+
+      <!-- RIGHT CHEST TEXT -->
+      <text x="175" y="164" font-family="DM Sans, sans-serif" font-size="11" font-weight="900" fill="rgba(255,255,255,0.9)" text-anchor="middle" letter-spacing="1">SWITCH</text>
+      <text x="175" y="178" font-family="DM Sans, sans-serif" font-size="7.5" font-weight="600" fill="rgba(255,255,255,0.35)" text-anchor="middle" letter-spacing="1.5">EMPLOYEE</text>
+
+      <!-- Fabric texture lines (very subtle) -->
+      <path d="M56 180 L224 180" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+      <!-- Highlight on sleeve seam left -->
+      <path d="M44 104 L56 180" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <!-- Highlight on sleeve seam right -->
+      <path d="M236 104 L224 180" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+      <!-- Bottom hem -->
+      <path d="M56 298 Q56 306 64 306 L216 306 Q224 306 224 298" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" fill="none"/>
+    </svg>
+    <span class="view-label">Front View</span>
+  </div>
+
+  <!-- BACK VIEW -->
+  <div class="view-wrap">
+    <svg width="280" height="320" viewBox="0 0 280 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="140" cy="312" rx="80" ry="8" fill="rgba(0,0,0,0.10)"/>
+
+      <!-- Body -->
+      <path d="M52 88 L28 108 L44 180 L56 180 L56 300 Q56 308 64 308 L216 308 Q224 308 224 300 L224 180 L236 180 L252 108 L228 88 Q214 106 200 112 Q172 122 140 122 Q108 122 80 112 Q66 106 52 88Z" fill="#111111"/>
+
+      <!-- Sleeve left -->
+      <path d="M52 88 Q38 78 24 76 L8 120 L28 128 L44 104 Z" fill="#111111"/>
+      <!-- Sleeve right -->
+      <path d="M228 88 Q242 78 256 76 L272 120 L252 128 L236 104 Z" fill="#111111"/>
+
+      <!-- Back collar -->
+      <path d="M104 90 Q120 96 140 97 Q160 96 176 90 Q168 80 140 80 Q112 80 104 90Z" fill="#1A1A1A"/>
+
+      <!-- LARGE BACK LOGO -->
+      <!-- Big wordmark -->
+      <text x="140" y="195" font-family="DM Sans, sans-serif" font-size="36" font-weight="900" fill="white" text-anchor="middle" letter-spacing="-1" opacity="0.95">switch</text>
+      <!-- Tagline -->
+      <text x="140" y="218" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="rgba(255,255,255,0.3)" text-anchor="middle" letter-spacing="3">HIRE SMARTER · WORK BETTER</text>
+
+      <!-- Subtle divider line above wordmark -->
+      <line x1="94" y1="162" x2="186" y2="162" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <!-- Small S logo above text -->
+      <rect x="122" y="136" width="36" height="22" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+      <text x="140" y="152" font-family="DM Sans, sans-serif" font-size="13" font-weight="900" fill="rgba(255,255,255,0.7)" text-anchor="middle">S</text>
+
+      <!-- Fabric lines -->
+      <path d="M56 180 L224 180" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+      <path d="M44 104 L56 180" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <path d="M236 104 L224 180" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <path d="M56 298 Q56 306 64 306 L216 306 Q224 306 224 298" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" fill="none"/>
+    </svg>
+    <span class="view-label">Back View</span>
+  </div>
+
+</div>
+
+<!-- DETAIL CARDS -->
+<div class="details-grid">
+  <div class="detail-card">
+    <div class="label">Base Color</div>
+    <div class="swatch-row">
+      <div class="swatch" style="background:#111111;"></div>
+      <div>
+        <div class="value">Jet Black</div>
+        <div class="swatch-name">#111111</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-card">
+    <div class="label">Logo & Branding</div>
+    <div class="swatch-row">
+      <div class="swatch" style="background:#FFFFFF; border: 1px solid #ddd;"></div>
+      <div>
+        <div class="value">Pure White</div>
+        <div class="swatch-name">S mark + wordmark</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-card">
+    <div class="label">Front Placement</div>
+    <div class="value">Left chest — S logo badge<br><span style="font-size:13px;font-weight:500;color:#666">Right chest — SWITCH / EMPLOYEE</span></div>
+  </div>
+
+  <div class="detail-card">
+    <div class="label">Back Placement</div>
+    <div class="value">Center back — switch wordmark<br><span style="font-size:13px;font-weight:500;color:#666">Tagline below in subtle white</span></div>
+  </div>
+
+  <div class="detail-card">
+    <div class="label">Fabric</div>
+    <div class="value">220 GSM Piqué Cotton<br><span style="font-size:13px;font-weight:500;color:#666">Moisture-wicking weave</span></div>
+  </div>
+
+  <div class="detail-card">
+    <div class="label">Print Method</div>
+    <div class="value">Embroidery — chest logo<br><span style="font-size:13px;font-weight:500;color:#666">Screen print — back wordmark</span></div>
+  </div>
+</div>
+
+<div style="font-size:12px;color:#aaa;padding-bottom:32px;">Switch Uniform Collection · Employee Edition · 2025</div>
+
+</body>
+</html>

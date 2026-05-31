@@ -1,0 +1,74 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+.next/
+out/
+
+# Android build
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/app 2/
+android/gradle 2/
+android-employer/app 2/
+android-employer/gradle 2/
+android-employer/app/build/
+android-employer/build/
+android-employer/.gradle/
+android-employer/local.properties
+*.apk
+*.aab
+
+# Loose image files in root
+ChatGPT Image*
+
+# iOS build
+ios/App/Pods/
+ios/App/App.xcworkspace/xcuserdata/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# iCloud
+*.icloud
+.vercel
+
+# SQLite database
+prisma/dev.db
+prisma/*.db
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+
+# Android signing
+keystore/
+*/signing.properties
+build/aab/
+backups/
+
+# Local AI agent settings (Claude Code)
+.claude/
